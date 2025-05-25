@@ -50,9 +50,10 @@ resource "aws_security_group" "allow_user_to_connect" {
 }
 
 resource "aws_instance" "my_app_server" {
-    count = var.instance_count
+    count = var.private_instance_count
     ami = var.ami
     instance_type = var.instance_type
+    subnet_id = aws_subnet.public.id
     key_name        = aws_key_pair.deployer.key_name
     security_groups = [aws_security_group.allow_user_to_connect.name]
   root_block_device {
@@ -60,6 +61,19 @@ resource "aws_instance" "my_app_server" {
     volume_type = "gp3"
   }
     tags = {
-        Name = "${var.my_env}-tws-demo-app-server"
+        Name = "${var.my_env}-public-instance-${count.index + 1}"
     }
+}
+
+
+resource "aws_instance" "private_instance" {
+  count                      = var.private_instance_count
+  ami                        = "ami-0c94855ba95c71c99"  # Example AMI
+  instance_type              = "t3.micro"
+  subnet_id                  = aws_subnet.private.id
+  associate_public_ip_address = var.associate_public_ip_address
+
+  tags = {
+    Name = "${var.my_env}-private-instance-${count.index + 1}"
+  }
 }
