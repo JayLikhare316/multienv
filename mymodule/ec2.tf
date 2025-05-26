@@ -50,7 +50,7 @@ resource "aws_security_group" "allow_user_to_connect" {
 }
 
 resource "aws_instance" "my_app_server" {
-    count = var.private_instance_count
+    count = var.public_instance_count
     ami = var.ami
     instance_type = var.instance_type
     subnet_id = aws_subnet.public.id
